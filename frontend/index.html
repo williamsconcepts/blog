@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>My Blog</title>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">My Blog</div>
+
+      <div class="nav-icons">
+        <i class="fa-regular fa-moon"></i>
+
+        <i class="fa-regular fa-bell"></i>
+
+        <div class="profile">
+          <span> JD </span>
+
+          <p>
+            John Doe
+            <i class="fa-solid fa-chevron-down"></i>
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="content">
+        <!-- CREATE POST -->
+
+        <div class="create-post">
+          <h2>Create a New Post</h2>
+
+          <div class="inputs">
+            <div>
+              <label> Title </label>
+
+              <input id="postTitle" placeholder="Enter an engaging title..." />
+            </div>
+
+            <div>
+              <label> Category </label>
+
+              <select id="categorySelect">
+                <option>Select a category</option>
+              </select>
+            </div>
+          </div>
+
+          <label> Content </label>
+
+          <div class="editor">
+            <textarea
+              id="postContent"
+              placeholder="Write your post content here..."
+            ></textarea>
+          </div>
+
+          <div class="buttons">
+            <button>Save Draft</button>
+
+            <button id="publishBtn" class="publish">Publish Post</button>
+          </div>
+        </div>
+
+        <!-- POSTS WILL LOAD HERE -->
+
+        <div id="postsContainer"></div>
+      </section>
+
+      <aside>
+        <div class="side-card">
+          <h2>About</h2>
+
+          <p>
+            Welcome to my blog! I write about life, travel, and everything in
+            between.
+          </p>
+        </div>
+
+        <br>
+        <div class="side-card">
+          <h2>Categories</h2>
+
+          <ul id="categoryList"></ul>
+        </div>
+
+        <br>
+        <div class="side-card">
+          <h2>Popular Posts</h2>
+
+          <div id="popularPosts"></div>
+        </div>
+      </aside>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
