@@ -18,10 +18,10 @@ This API allows users to create blog posts, manage categories, comment on posts,
 ## Posts
 
 - Create posts
-- View all posts
+- View all posts with comments
 - View single post
 - Update posts
-- Delete posts
+- Delete posts with comments less than 5
 - Like posts
 
 
@@ -30,6 +30,8 @@ This API allows users to create blog posts, manage categories, comment on posts,
 - Create categories
 - View categories
 - Assign categories to posts
+- Delete category with no posts assigned
+-
 
 
 ## Comments
@@ -37,6 +39,7 @@ This API allows users to create blog posts, manage categories, comment on posts,
 - Comment on posts
 - Link comments to posts
 - View comments by post
+
 
 
 ## Popular Posts
@@ -86,3 +89,5 @@ Backend:
 │ └── migrations/
 │
 └── README.md
+
+

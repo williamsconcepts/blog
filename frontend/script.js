@@ -1,5 +1,9 @@
 const API = "http://localhost:5000";
 
+// =======================
+// DOM ELEMENTS
+// =======================
+
 const titleInput = document.querySelector("#postTitle");
 
 const contentInput = document.querySelector("#postContent");
@@ -15,7 +19,7 @@ const categoryList = document.querySelector("#categoryList");
 const popularPosts = document.querySelector("#popularPosts");
 
 // =======================
-// LOAD CATEGORY
+// LOAD CATEGORIES
 // =======================
 
 async function loadCategories() {
@@ -24,9 +28,11 @@ async function loadCategories() {
   const categories = await res.json();
 
   categorySelect.innerHTML = `
+
 <option>
 Select category
 </option>
+
 `;
 
   categoryList.innerHTML = "";
@@ -43,8 +49,8 @@ ${cat.title}
 `;
 
     categoryList.innerHTML += `
-<br>
-<li >
+
+<li>
 
 ${cat.title}
 
@@ -67,19 +73,15 @@ publishBtn.onclick = async () => {
     categoryId: categorySelect.value,
   };
 
-  await fetch(
-    `${API}/posts/create`,
+  await fetch(`${API}/posts/create`, {
+    method: "POST",
 
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+
+    body: JSON.stringify(data),
+  });
 
   titleInput.value = "";
 
@@ -89,18 +91,25 @@ publishBtn.onclick = async () => {
 };
 
 // =======================
-// LOAD POSTS with Comments
+// LOAD POSTS
 // =======================
 
-async function loadPosts() {
-  const res = await fetch(`${API}/posts`);
+async function loadPosts(query = "") {
+  const res = await fetch(`${API}/posts${query}`);
 
-  const posts = await res.json();
+  let posts = await res.json();
+
+  // if grouped by category convert object to array
+
+  if (!Array.isArray(posts)) {
+    posts = Object.values(posts).flat();
+  }
 
   postsContainer.innerHTML = "";
 
   posts.forEach((post) => {
     postsContainer.innerHTML += `
+
 
 <div class="post-card">
 
@@ -113,6 +122,7 @@ async function loadPosts() {
 ${post.title}
 
 </h2>
+
 
 
 <span>
@@ -128,18 +138,18 @@ ${post.title}
 
 
 
-
 <div class="meta">
 
+
 ${new Date(post.createdAt).toDateString()}
+
+
 •
 
 ${post.category}
 
 
-
 </div>
-
 
 
 
@@ -171,6 +181,7 @@ ${post.postContent}
 
 
 
+
 <span>
 
 💬 ${post.comments.length} Comments
@@ -187,7 +198,6 @@ ${post.postContent}
 
 
 
-<!-- COMMENTS -->
 
 <div class="comments">
 
@@ -197,6 +207,8 @@ ${post.postContent}
 Comments
 
 </h4>
+
+
 
 
 
@@ -211,15 +223,15 @@ No comments yet
 `
     : post.comments
         .map(
-          (comment) =>
-            `
+          (comment) => `
+
 
 <div class="comment">
 
 
 <div class="avatar">
 
-${comment.userName.charAt(0).toUpperCase()}
+${comment.username.charAt(0).toUpperCase()}
 
 </div>
 
@@ -230,9 +242,10 @@ ${comment.userName.charAt(0).toUpperCase()}
 
 <b>
 
-${comment.userName}
+${comment.username}
 
 </b>
+
 
 
 <p>
@@ -243,25 +256,20 @@ ${comment.comment}
 
 
 
-<small>
-
-Reply
-
-</small>
-
-
-
 </div>
 
 
 
 </div>
+
 
 
 `,
         )
         .join("")
 }
+
+
 
 
 
@@ -277,12 +285,12 @@ Reply
 <div class="comment-box">
 
 
+
 <input
 
 id="name-${post.id}"
 
 placeholder="Your name"
-
 
 />
 
@@ -318,6 +326,8 @@ Post Comment
 
 
 
+
+
 </div>
 
 
@@ -326,7 +336,7 @@ Post Comment
 }
 
 // =======================
-// LIKE
+// LIKE POST
 // =======================
 
 async function likePost(id) {
@@ -342,7 +352,7 @@ async function likePost(id) {
 }
 
 // =======================
-// COMMENT
+// ADD COMMENT
 // =======================
 
 async function addComment(id) {
@@ -369,23 +379,32 @@ async function addComment(id) {
   );
 
   alert("Comment added");
+
   loadPosts();
 }
 
 // =======================
-// POPULAR
+// POPULAR POSTS
 // =======================
 
 async function loadPopular() {
-  const res = await fetch(`${API}/posts/popular`);
+  const res = await fetch(`${API}/posts?sort=likes&order=desc`);
 
-  const posts = await res.json();
+  let posts = await res.json();
+
+  if (!Array.isArray(posts)) {
+    posts = Object.values(posts).flat();
+  }
 
   popularPosts.innerHTML = "";
 
-  posts.forEach((post) => {
-    popularPosts.innerHTML += `
-<br>
+  posts
+    .slice(0, 3)
+
+    .forEach((post) => {
+      popularPosts.innerHTML += `
+
+
 <div class="popular">
 
 
@@ -394,6 +413,7 @@ async function loadPopular() {
 ${post.title}
 
 </b>
+
 
 
 <p>
@@ -408,11 +428,37 @@ ${post.title}
 
 
 `;
-  });
+    });
 }
+
+// =======================
+// FILTER FUNCTIONS
+// =======================
+
+// group by category
+
+function groupByCategory() {
+  loadPosts("?groupby=category");
+}
+
+// most liked
+
+function sortByLikes() {
+  loadPosts("?sort=likes&order=desc");
+}
+
+// most commented
+
+function sortByComments() {
+  loadPosts("?sort=comments&order=desc");
+}
+
+// =======================
+// INITIAL LOAD
+// =======================
 
 loadCategories();
 
-loadPosts();
+loadPosts("?commentLimit=2");
 
 loadPopular();

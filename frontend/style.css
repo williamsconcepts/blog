@@ -3,7 +3,7 @@
 
   --primary: #4f46e5;
   --primary-light: #ede9fe;
-  --background: #f8fafc;
+  --background: linear-gradient(45deg, #92cfeb, #d99ae6);;
   --surface: #ffffff;
   --text: #111827;
   --muted: #64748b;
