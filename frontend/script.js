@@ -1,25 +1,260 @@
 const API = "http://localhost:5000";
 
 // =======================
-// DOM ELEMENTS
+// DOM
 // =======================
 
 const titleInput = document.querySelector("#postTitle");
-
 const contentInput = document.querySelector("#postContent");
-
 const categorySelect = document.querySelector("#categorySelect");
-
 const publishBtn = document.querySelector("#publishBtn");
 
 const postsContainer = document.querySelector("#postsContainer");
-
 const categoryList = document.querySelector("#categoryList");
-
 const popularPosts = document.querySelector("#popularPosts");
 
+// AUTH
+
+const authBtn = document.querySelector("#authBtn");
+
+const authModal = document.querySelector("#authModal");
+
+const closeModal = document.querySelector("#closeModal");
+
+const loginForm = document.querySelector("#loginForm");
+
+const registerForm = document.querySelector("#registerForm");
+
+const toggleAuth = document.querySelector("#toggleAuth");
+
+const authTitle = document.querySelector("#authTitle");
+
+const userAvatar = document.querySelector("#userAvatar");
+
+const usernameDisplay = document.querySelector("#username");
+
 // =======================
-// LOAD CATEGORIES
+// TOKEN
+// =======================
+
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+
+    Authorization: `Bearer ${getToken()}`,
+  };
+}
+
+// =======================
+// AUTH STATE
+// =======================
+
+
+function updateAuthButton(){
+
+  const token = getToken();
+
+
+  if(token){
+
+    authBtn.textContent = "Logout";
+
+    authBtn.onclick = logout;
+
+
+  }else{
+
+
+    authBtn.textContent = "Login";
+
+    authBtn.onclick = ()=>{
+
+      authModal.style.display="flex";
+
+    };
+
+
+  }
+
+}
+
+
+
+
+function logout(){
+
+
+  localStorage.removeItem("token");
+
+
+  userAvatar.textContent = "JD";
+
+
+  usernameDisplay.innerHTML =
+  `
+  John Doe
+  <i class="fa-solid fa-chevron-down"></i>
+  `;
+
+
+  updateAuthButton();
+
+
+  alert("Logged out successfully");
+
+
+}
+
+// =======================
+// MODAL
+// =======================
+
+updateAuthButton();
+
+closeModal.onclick = () => {
+  authModal.style.display = "none";
+};
+
+window.onclick = (e) => {
+  if (e.target === authModal) {
+    authModal.style.display = "none";
+  }
+};
+
+toggleAuth.onclick = () => {
+  loginForm.classList.toggle("hidden");
+
+  registerForm.classList.toggle("hidden");
+
+  if (loginForm.classList.contains("hidden")) {
+    authTitle.textContent = "Register";
+
+    toggleAuth.textContent = "Already have account? Login";
+  } else {
+    authTitle.textContent = "Login";
+
+    toggleAuth.textContent = "Create account";
+  }
+};
+
+// =======================
+// LOGIN
+// =======================
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.querySelector("#loginEmail").value;
+
+  const password = document.querySelector("#loginPassword").value;
+
+  const res = await fetch(`${API}/login`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      email,
+
+      password,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (data.token || data.accessToken) {
+    const token = data.token || data.accessToken;
+
+    localStorage.setItem("token", token);
+
+    alert("Login successful");
+
+    authModal.style.display = "none";
+
+    loadCurrentUser();
+
+    updateAuthButton();
+  } else {
+    alert(data.message || "Login failed");
+  }
+});
+
+// =======================
+// REGISTER
+// =======================
+
+registerForm.addEventListener(
+  "submit",
+
+  async (e) => {
+    e.preventDefault();
+
+    const name = document.querySelector("#registerName").value;
+
+    const email = document.querySelector("#registerEmail").value;
+
+    const password = document.querySelector("#registerPassword").value;
+
+    const res = await fetch(
+      `${API}/register`,
+
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          name,
+
+          email,
+
+          password,
+        }),
+      },
+    );
+
+    const data = await res.json();
+
+    alert(data.message);
+  },
+);
+
+// =======================
+// CURRENT USER
+// =======================
+
+async function loadCurrentUser() {
+  const token = getToken();
+
+  if (!token) return;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    userAvatar.textContent = payload.name.charAt(0).toUpperCase();
+
+    usernameDisplay.innerHTML = `
+${payload.name}
+
+<i class="fa-solid fa-chevron-down"></i>
+`;
+  } catch (error) {
+    console.log(error);
+
+    localStorage.removeItem("token");
+  }
+}
+
+// =======================
+// CATEGORIES
 // =======================
 
 async function loadCategories() {
@@ -28,11 +263,9 @@ async function loadCategories() {
   const categories = await res.json();
 
   categorySelect.innerHTML = `
-
 <option>
 Select category
 </option>
-
 `;
 
   categoryList.innerHTML = "";
@@ -65,6 +298,12 @@ ${cat.title}
 // =======================
 
 publishBtn.onclick = async () => {
+  if (!getToken()) {
+    alert("Please login first");
+
+    return;
+  }
+
   const data = {
     title: titleInput.value,
 
@@ -73,15 +312,21 @@ publishBtn.onclick = async () => {
     categoryId: categorySelect.value,
   };
 
-  await fetch(`${API}/posts/create`, {
-    method: "POST",
+  const res = await fetch(
+    `${API}/posts/create`,
 
-    headers: {
-      "Content-Type": "application/json",
+    {
+      method: "POST",
+
+      headers: authHeaders(),
+
+      body: JSON.stringify(data),
     },
+  );
 
-    body: JSON.stringify(data),
-  });
+  const result = await res.json();
+
+  alert(result.message || "Post created");
 
   titleInput.value = "";
 
@@ -95,26 +340,22 @@ publishBtn.onclick = async () => {
 // =======================
 
 async function loadPosts(query = "") {
-  const res = await fetch(`${API}/posts${query}`);
+  try {
+    const res = await fetch(`${API}/posts${query}`);
 
-  let posts = await res.json();
+    let posts = await res.json();
 
-  // if grouped by category convert object to array
+    if (!Array.isArray(posts)) {
+      posts = Object.values(posts).flat();
+    }
 
-  if (!Array.isArray(posts)) {
-    posts = Object.values(posts).flat();
-  }
+    postsContainer.innerHTML = "";
 
-  postsContainer.innerHTML = "";
-
-  posts.forEach((post) => {
-    postsContainer.innerHTML += `
+    posts.forEach((post) => {
+      postsContainer.innerHTML += `
 
 
 <div class="post-card">
-
-
-<div class="post-header">
 
 
 <h2>
@@ -125,24 +366,10 @@ ${post.title}
 
 
 
-<span>
-
-•••
-
-</span>
-
-
-</div>
-
-
-
-
-
 <div class="meta">
 
 
 ${new Date(post.createdAt).toDateString()}
-
 
 •
 
@@ -150,9 +377,6 @@ ${post.category}
 
 
 </div>
-
-
-
 
 
 
@@ -166,34 +390,24 @@ ${post.postContent}
 
 
 
-
-
 <div class="stats">
 
 
 <button onclick="likePost(${post.id})">
 
-
-❤️ ${post.likes} Likes
-
+❤️ ${post.likes}
 
 </button>
 
 
-
-
 <span>
 
-💬 ${post.comments.length} Comments
+💬 ${post.comments.length}
 
 </span>
 
 
-
 </div>
-
-
-
 
 
 
@@ -210,28 +424,18 @@ Comments
 
 
 
-
-
 ${
-  post.comments.length === 0
-    ? `
-
-<p>
-No comments yet
-</p>
-
-`
-    : post.comments
+  post.comments.length
+    ? post.comments
         .map(
-          (comment) => `
-
+          (c) => `
 
 <div class="comment">
 
 
 <div class="avatar">
 
-${comment.username.charAt(0).toUpperCase()}
+${c.username[0].toUpperCase()}
 
 </div>
 
@@ -242,40 +446,33 @@ ${comment.username.charAt(0).toUpperCase()}
 
 <b>
 
-${comment.username}
+${c.username}
 
 </b>
 
 
-
 <p>
 
-${comment.comment}
+${c.comment}
 
 </p>
 
 
-
 </div>
 
 
-
 </div>
-
 
 
 `,
         )
         .join("")
+    : "<p>No comments</p>"
 }
 
 
 
-
-
 </div>
-
-
 
 
 
@@ -285,45 +482,28 @@ ${comment.comment}
 <div class="comment-box">
 
 
-
 <input
-
 id="name-${post.id}"
-
-placeholder="Your name"
-
+placeholder="Name"
 />
 
 
 
-
-
 <textarea
-
 id="comment-${post.id}"
-
-placeholder="Write a comment"
-
+placeholder="Comment"
 ></textarea>
-
-
 
 
 
 <button onclick="addComment(${post.id})">
 
-
 Post Comment
-
 
 </button>
 
 
-
 </div>
-
-
-
 
 
 
@@ -332,11 +512,14 @@ Post Comment
 
 
 `;
-  });
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // =======================
-// LIKE POST
+// LIKE
 // =======================
 
 async function likePost(id) {
@@ -352,7 +535,7 @@ async function likePost(id) {
 }
 
 // =======================
-// ADD COMMENT
+// COMMENT
 // =======================
 
 async function addComment(id) {
@@ -378,8 +561,6 @@ async function addComment(id) {
     },
   );
 
-  alert("Comment added");
-
   loadPosts();
 }
 
@@ -388,9 +569,9 @@ async function addComment(id) {
 // =======================
 
 async function loadPopular() {
-  const res = await fetch(`${API}/posts?sort=likes&order=desc`);
-
-  let posts = await res.json();
+  let posts = await fetch(`${API}/posts?sort=likes&order=desc`).then((res) =>
+    res.json(),
+  );
 
   if (!Array.isArray(posts)) {
     posts = Object.values(posts).flat();
@@ -415,13 +596,11 @@ ${post.title}
 </b>
 
 
-
 <p>
 
 ❤️ ${post.likes}
 
 </p>
-
 
 
 </div>
@@ -432,29 +611,7 @@ ${post.title}
 }
 
 // =======================
-// FILTER FUNCTIONS
-// =======================
-
-// group by category
-
-function groupByCategory() {
-  loadPosts("?groupby=category");
-}
-
-// most liked
-
-function sortByLikes() {
-  loadPosts("?sort=likes&order=desc");
-}
-
-// most commented
-
-function sortByComments() {
-  loadPosts("?sort=comments&order=desc");
-}
-
-// =======================
-// INITIAL LOAD
+// START APP
 // =======================
 
 loadCategories();
@@ -462,3 +619,7 @@ loadCategories();
 loadPosts("?commentLimit=2");
 
 loadPopular();
+
+loadCurrentUser();
+
+updateAuthButton();

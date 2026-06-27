@@ -3,7 +3,7 @@
 
   --primary: #4f46e5;
   --primary-light: #ede9fe;
-  --background: linear-gradient(45deg, #92cfeb, #d99ae6);;
+  --background: linear-gradient(45deg, #92cfeb, #d99ae6);
   --surface: #ffffff;
   --text: #111827;
   --muted: #64748b;
@@ -111,6 +111,117 @@ main {
 /* ===========================
 CARD SYSTEM
 =========================== */
+/* =====================
+AUTH BUTTON
+===================== */
+
+.auth-btn {
+  background: var(--primary);
+
+  color: white;
+
+  border: none;
+
+  padding: 10px 20px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-weight: bold;
+}
+
+/* =====================
+AUTH MODAL
+===================== */
+
+.hidden {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  display: none;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+
+  width: 350px;
+
+  padding: 30px;
+
+  border-radius: 16px;
+
+  box-shadow: var(--shadow);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+}
+
+.modal-content input {
+  width: 100%;
+
+  padding: 12px;
+
+  margin-bottom: 15px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 8px;
+}
+
+.modal-content button {
+  width: 100%;
+
+  padding: 12px;
+
+  background: var(--primary);
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.close {
+  float: right;
+
+  font-size: 25px;
+
+  cursor: pointer;
+}
+
+.switch {
+  margin-top: 20px;
+
+  text-align: center;
+
+  color: var(--primary);
+
+  cursor: pointer;
+}
 
 .create-post,
 .post-card,

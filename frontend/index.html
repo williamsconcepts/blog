@@ -24,11 +24,14 @@
 
         <i class="fa-regular fa-bell"></i>
 
-        <div class="profile">
-          <span> JD </span>
+        <button id="authBtn" class="auth-btn">Login</button>
 
-          <p>
+        <div class="profile">
+          <span id="userAvatar"> JD </span>
+
+          <p id="username">
             John Doe
+
             <i class="fa-solid fa-chevron-down"></i>
           </p>
         </div>
@@ -37,8 +40,6 @@
 
     <main>
       <section class="content">
-        <!-- CREATE POST -->
-
         <div class="create-post">
           <h2>Create a New Post</h2>
 
@@ -53,7 +54,7 @@
               <label> Category </label>
 
               <select id="categorySelect">
-                <option>Select a category</option>
+                <option>Select category</option>
               </select>
             </div>
           </div>
@@ -74,8 +75,6 @@
           </div>
         </div>
 
-        <!-- POSTS WILL LOAD HERE -->
-
         <div id="postsContainer"></div>
       </section>
 
@@ -83,28 +82,57 @@
         <div class="side-card">
           <h2>About</h2>
 
-          <br>
           <p>
-            Welcome to my blog! I write about life, travel, and everything in
+            Welcome to my blog! I write about life, travel and everything in
             between.
           </p>
         </div>
 
-        <br>
         <div class="side-card">
           <h2>Categories</h2>
-          <br>
+
           <ul id="categoryList"></ul>
         </div>
 
-      <br>
         <div class="side-card">
           <h2>Popular Posts</h2>
-          <br>
+
           <div id="popularPosts"></div>
         </div>
       </aside>
     </main>
+
+    <!-- AUTH MODAL -->
+
+    <div id="authModal" class="modal">
+      <div class="modal-content">
+        <span id="closeModal" class="close"> &times; </span>
+
+        <h2 id="authTitle">Login</h2>
+
+        <form id="loginForm">
+          <input id="loginEmail" type="email" placeholder="Email" />
+
+          <input id="loginPassword" type="password" placeholder="Password" />
+
+          <button>Login</button>
+        </form>
+
+        <form id="registerForm" class="hidden">
+          <input id="registerName" placeholder="Full name" />
+
+          <input id="registerEmail" type="email" placeholder="Email" />
+
+          <input id="registerPassword" type="password" placeholder="Password" />
+
+          <button>Register</button>
+        </form>
+
+        <p class="switch">
+          <span id="toggleAuth"> Create account </span>
+        </p>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>
