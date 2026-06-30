@@ -53,60 +53,35 @@ function authHeaders() {
 // AUTH STATE
 // =======================
 
-
-function updateAuthButton(){
-
+function updateAuthButton() {
   const token = getToken();
 
-
-  if(token){
-
+  if (token) {
     authBtn.textContent = "Logout";
 
     authBtn.onclick = logout;
-
-
-  }else{
-
-
+  } else {
     authBtn.textContent = "Login";
 
-    authBtn.onclick = ()=>{
-
-      authModal.style.display="flex";
-
+    authBtn.onclick = () => {
+      authModal.style.display = "flex";
     };
-
-
   }
-
 }
 
-
-
-
-function logout(){
-
-
+function logout() {
   localStorage.removeItem("token");
-
 
   userAvatar.textContent = "JD";
 
-
-  usernameDisplay.innerHTML =
-  `
+  usernameDisplay.innerHTML = `
   John Doe
   <i class="fa-solid fa-chevron-down"></i>
   `;
 
-
   updateAuthButton();
 
-
   alert("Logged out successfully");
-
-
 }
 
 // =======================
